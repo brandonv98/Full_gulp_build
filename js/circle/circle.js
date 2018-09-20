@@ -1,3 +1,4 @@
+///    Auto generated code, your changes will be overwritten.   ///
 $( document ).ready(function() {
 
   $('textarea').autogrow({onInitialize: true});
