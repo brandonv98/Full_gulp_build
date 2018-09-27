@@ -7,7 +7,9 @@ var gulp = require('gulp'),
     maps = require('gulp-sourcemaps'),
     cleanCSS = require('gulp-clean-css'),
     sass = require('gulp-sass'),
+    browserSync = require('browser-sync').create(),
     del = require('del');
+
 
     // Concat JS scripts.
 gulp.task("concatScripts", function() {
@@ -19,7 +21,8 @@ gulp.task("concatScripts", function() {
    .pipe(concat('global.js'))
     .pipe(maps.write('./'))
     .pipe(rename('all.map.js'))
-    .pipe(gulp.dest('js'));
+    .pipe(gulp.dest('js'))
+    .pipe(browserSync.stream());
 });
 
     // Minify JS scripts
@@ -36,8 +39,10 @@ gulp.task('compileSass', function() {
     return gulp.src("sass/global.scss")
         .pipe(maps.init())
         .pipe(sass())
+        .pipe(rename('all.css'))
         .pipe(maps.write('./'))
-        .pipe(gulp.dest('styles'));
+        .pipe(gulp.dest('styles'))
+        .pipe(browserSync.stream());
 });
 
     // Minify css files
@@ -49,45 +54,57 @@ gulp.task('styles', ['compileSass'], () => {
       .pipe(gulp.dest('dist/styles'));
   });
 
-// Clean
-gulp.task('clean', function() {
-    del(['dist']);
-  });
-
-     // Prebuild application
-gulp.task('prebuild', ['clean', 'scripts', 'compileSass'], function() {
-    return gulp.src('styles/*.css')
-      .pipe(cleanCSS({compatibility: 'ie8'}))
-      .pipe(rename('styles.min.css'))
-      .pipe(gulp.dest('styles'));
-  });
-
     // Optimize images
 gulp.task('images', function() {
     return gulp.src([ 'images/**', 'icons/**', 'fonts/**'], { base: './'})
       .pipe(gulp.dest('dist/content'));
 });
 
-  // Build application 
+    // Static Server + watching scss/html files
+gulp.task('serve', ['styles', 'scripts'], function() {
+
+    browserSync.init({
+        server: "./"
+    });
+
+    gulp.watch("./sass/*.scss", ['styles']);
+    gulp.watch('./js/*.js', ['scripts']);
+    gulp.watch("./*.html").on('change', browserSync.reload);
+});
+
+
+///////=======      Production Build application       ========///////
+
+    // Prebuild
+gulp.task('prebuild', ['clean', 'scripts', 'compileSass'], function() {
+return gulp.src('styles/*.css')
+    .pipe(cleanCSS({compatibility: 'ie8'}))
+    .pipe(rename('all.min.css'))
+    .pipe(gulp.dest('dist/styles'));
+});
+
+    // Build application 
 gulp.task('build', ['prebuild'], function() {
-      return gulp.src(['styles/styles.min.css', 'js/app.min.js', 'index.html',
+      return gulp.src(['styles/all.css', 'js/all.min.js', 'index.html',
       "images/**", 'icons/**', "fonts/**"], { base: './'})
         .pipe(gulp.dest('dist'));
 });
 
-  // Minify all files.
+    // Minify all files.
 gulp.task('minifyFiles', ['minifyScripts', 'minifyCss']);
 
-   // Watch for changes on all files.
+    // Watch for changes on all files.
 gulp.task('watchFiles', function() {
     gulp.watch('sass/**/*.scss', ['compileSass']);
     gulp.watch('js/global.js', ['concatScripts']);
-  });
+});
 
-    // Branch for gulp watch files.
-gulp.task('serve', ['watchFiles']);
+    // Clean
+gulp.task('clean', function() {
+    del(['dist', 'styles']);
+});
 
     // Default 
-gulp.task('default', ['build'], function() {
+gulp.task('default', ['build', 'serve'], function() {
    console.log('All done!');
 });

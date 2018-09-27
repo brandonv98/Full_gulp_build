@@ -3,6 +3,7 @@ $( document ).ready(function() {
 
   $('textarea').autogrow({onInitialize: true});
 
+console.log('Its ALIVE!!');
 
   //Cloner for infinite input lists
   $(".circle--clone--list").on("click", ".circle--clone--add", function(){
@@ -51,9 +52,6 @@ $( document ).ready(function() {
   input.wrap(function() {
     return "<a class='button " + state + "'>" + text + "</div>";
   });
-
-
-
 
 });
 /*
