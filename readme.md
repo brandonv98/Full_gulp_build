@@ -50,13 +50,15 @@ $ git clone https://github.com/brandonv98/Full_gulp_build.git
   ```
   $ gulp build
   ```
+  ### Testing local web server
+    ``` $ gulp serve ```
 ### 4. Step Four 
   Back in the project, open the index.html file.
 ___
 
 
 ### Deployment
- N/A 
+ ```$ gulp build ```
 
 ___
 
