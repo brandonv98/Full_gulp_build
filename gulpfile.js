@@ -93,11 +93,6 @@ gulp.task('build', ['prebuild'], function() {
     // Minify all files.
 gulp.task('minifyFiles', ['minifyScripts', 'minifyCss']);
 
-    // Watch for changes on all files.
-gulp.task('watchFiles', function() {
-    gulp.watch('sass/**/*.scss', ['compileSass']);
-    gulp.watch('js/global.js', ['concatScripts']);
-});
 
     // Clean
 gulp.task('clean', function() {
